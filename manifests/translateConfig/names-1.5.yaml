@@ -1,0 +1,6 @@
+DeprecatedComponentNames:
+  - "Injector"
+  - "CertManager"
+  - "NodeAgent"
+  - "SidecarInjector"
+

@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-bigip-ctlr-deployment
+  namespace: kube-system
+spec:
+  # DO NOT INCREASE REPLICA COUNT
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8s-bigip-ctlr
+  template:
+    metadata:
+      name: k8s-bigip-ctlr
+      labels:
+        app: k8s-bigip-ctlr
+    spec:
+      # Name of the Service Account bound to a Cluster Role with the required
+      # permissions
+      serviceAccountName: bigip-ctlr
+      containers:
+        - name: k8s-bigip-ctlr
+          image: "f5networks/k8s-bigip-ctlr:latest"
+          command: ["/app/bin/k8s-bigip-ctlr"]
+          args: [
+            # See the k8s-bigip-ctlr documentation for information about
+            # all config options
+            # https://clouddocs.f5.com/products/connectors/k8s-bigip-ctlr/latest
+            "--bigip-username=admin",
+            "--bigip-password=admin",
+            "--bigip-url=10.145.71.218",
+            "--bigip-partition=test",
+            "--pool-member-type=nodeport",
+            "--insecure=true",
+            "--log-level=info",
+            "--namespace=istio-system"
+            ]
+      imagePullSecrets:
+        # Secret that gives access to a private docker registry
+        - name: f5-docker-images
+        # Secret containing the BIG-IP system login credentials
+        - name: bigip-login
